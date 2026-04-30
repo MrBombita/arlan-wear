@@ -2147,13 +2147,24 @@
   function closeEverything() {
     // Cerrar todas las páginas/modales
     document.querySelectorAll('.collection-page').forEach(p => p.classList.remove('active'));
-    document.getElementById('productDetailPage').classList.remove('active');
-    document.getElementById('wishSidebar').classList.remove('open');
-    document.getElementById('wishOverlay').classList.remove('open');
-    document.getElementById('cartSidebar').classList.remove('open');
-    document.getElementById('cartOverlay').classList.remove('open');
-    // Restaurar scroll siempre
+    const pd = document.getElementById('productDetailPage');
+    if (pd) pd.classList.remove('active');
+    const ws = document.getElementById('wishSidebar');
+    if (ws) ws.classList.remove('open');
+    const wo = document.getElementById('wishOverlay');
+    if (wo) wo.classList.remove('open');
+    const cs = document.getElementById('cartSidebar');
+    if (cs) cs.classList.remove('open');
+    const co = document.getElementById('cartOverlay');
+    if (co) co.classList.remove('open');
+    const mm = document.getElementById('mobileMenu');
+    if (mm) mm.classList.remove('open');
+    const hb = document.getElementById('hamburger');
+    if (hb) hb.classList.remove('open');
+    menuOpen = false;
+    // Restaurar scroll SIEMPRE
     document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
   }
 
   function bnNav(section) {
@@ -2212,6 +2223,29 @@
   });
 
   initReveal();
+
+  // ══ BOTTOM NAV — sincronizar con scroll ══
+  const sections = ['hero','categories','shop','about','how','contact'];
+  const bnMap = { hero:'home', categories:'home', shop:'shop', about:'home', how:'home', contact:'home' };
+
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        const bnId = bnMap[id];
+        if (bnId) {
+          document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
+          const btn = document.getElementById('bn-' + bnId);
+          if (btn) btn.classList.add('active');
+        }
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) sectionObserver.observe(el);
+  });
 
   // Init
   updateNavAuth();
