@@ -1327,13 +1327,14 @@
 <div class="mobile-menu" id="mobileMenu">
   <div class="mobile-menu-inner">
     <span class="mobile-menu-logo">ARLAN WEAR</span>
-    <a href="#categories" class="mobile-nav-link" onclick="closeMobileMenu()">COLLECTIONS</a>
-    <a href="#shop" class="mobile-nav-link" onclick="closeMobileMenu()">SHOP</a>
-    <a href="#about" class="mobile-nav-link" onclick="closeMobileMenu()">MAISON</a>
-    <a href="#how" class="mobile-nav-link" onclick="closeMobileMenu()">EXPERIENCE</a>
-    <a href="#contact" class="mobile-nav-link" onclick="closeMobileMenu()">CONTACT</a>
+    <a href="#" class="mobile-nav-link" onclick="mobileNavTo('hero')">HOME</a>
+    <a href="#" class="mobile-nav-link" onclick="mobileNavTo('categories')">COLLECTIONS</a>
+    <a href="#" class="mobile-nav-link" onclick="mobileNavTo('shop')">SHOP</a>
+    <a href="#" class="mobile-nav-link" onclick="mobileNavTo('about')">MAISON</a>
+    <a href="#" class="mobile-nav-link" onclick="mobileNavTo('how')">EXPERIENCE</a>
+    <a href="#" class="mobile-nav-link" onclick="mobileNavTo('contact')">CONTACT</a>
     <div class="mobile-menu-actions">
-      <button class="mobile-login-btn" onclick="closeMobileMenu(); openLogin()">SIGN IN / REGISTER</button>
+      <button class="mobile-login-btn" onclick="closeMobileMenu(); closeEverything(); openLogin()">SIGN IN / REGISTER</button>
       <div class="mobile-social">
         <a href="#">INSTAGRAM</a>
         <a href="#">PRIVACY</a>
@@ -1759,6 +1760,16 @@
     document.getElementById('mobileMenu').classList.remove('open');
     document.getElementById('hamburger').classList.remove('open');
     document.body.style.overflow = '';
+  }
+
+  // Navegar desde el menú móvil — cierra todo primero
+  function mobileNavTo(sectionId) {
+    closeMobileMenu();
+    closeEverything();
+    setTimeout(() => {
+      const el = document.getElementById(sectionId);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 350); // espera que el menú termine de cerrar
   }
 
   // ══ CART ══
