@@ -19,8 +19,23 @@
     }
 
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; font-size: 18px; }
-    body { background: var(--black); color: var(--cream); font-family: 'EB Garamond', serif; overflow-x: hidden; cursor: none; }
+    html { scroll-behavior: smooth; font-size: 18px; -webkit-text-size-adjust: 100%; }
+    body { background: var(--black); color: var(--cream); font-family: 'EB Garamond', serif; overflow-x: hidden; }
+    button, a { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+    /* CURSOR — solo en desktop con mouse */
+    @media (hover: hover) and (pointer: fine) {
+      body { cursor: none; }
+      button, a, [onclick] { cursor: none !important; }
+    }
+
+    /* En touch: cursor normal y tap highlights quitados */
+    @media (hover: none), (pointer: coarse) {
+      body { cursor: auto; }
+      .cursor, .cursor-ring { display: none !important; }
+      * { -webkit-tap-highlight-color: transparent; }
+      button, a, [onclick] { cursor: pointer !important; touch-action: manipulation; }
+    }
 
     /* CURSOR */
     .cursor { width: 7px; height: 7px; background: var(--gold); border-radius: 50%; position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: transform 0.1s; }
@@ -1650,15 +1665,21 @@
 </div>
 
 <script>
-  // Cursor
+  // Cursor — solo en dispositivos con mouse
   const cursor = document.getElementById('cursor');
   const ring = document.getElementById('cursorRing');
-  document.addEventListener('mousemove', e => {
-    cursor.style.left = e.clientX + 'px';
-    cursor.style.top = e.clientY + 'px';
-    ring.style.left = e.clientX + 'px';
-    ring.style.top = e.clientY + 'px';
-  });
+  const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+  if (!isTouch) {
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+      ring.style.left = e.clientX + 'px';
+      ring.style.top = e.clientY + 'px';
+    });
+  } else {
+    if (cursor) cursor.style.display = 'none';
+    if (ring) ring.style.display = 'none';
+  }
 
   // ══ AUTH STATE ══
   let currentUser = null;
