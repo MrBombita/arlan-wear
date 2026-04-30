@@ -2133,21 +2133,37 @@
   // ══════════════════════════════════
   // BOTTOM NAV
   // ══════════════════════════════════
+  function closeEverything() {
+    // Cerrar todas las páginas/modales
+    document.querySelectorAll('.collection-page').forEach(p => p.classList.remove('active'));
+    document.getElementById('productDetailPage').classList.remove('active');
+    document.getElementById('wishSidebar').classList.remove('open');
+    document.getElementById('wishOverlay').classList.remove('open');
+    document.getElementById('cartSidebar').classList.remove('open');
+    document.getElementById('cartOverlay').classList.remove('open');
+    // Restaurar scroll siempre
+    document.body.style.overflow = '';
+  }
+
   function bnNav(section) {
     document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
     document.getElementById('bn-' + section)?.classList.add('active');
 
     if (section === 'home') {
-      closeWishlist(); closeProductDetail(); navigateBack();
-      document.getElementById('hero').scrollIntoView({ behavior: 'smooth' });
+      closeEverything();
+      setTimeout(() => {
+        document.getElementById('hero').scrollIntoView({ behavior: 'smooth' });
+      }, 50);
     } else if (section === 'shop') {
-      closeWishlist(); closeProductDetail();
-      document.getElementById('shop').scrollIntoView({ behavior: 'smooth' });
-      openCart();
+      closeEverything();
+      setTimeout(() => {
+        document.getElementById('shop').scrollIntoView({ behavior: 'smooth' });
+      }, 50);
     } else if (section === 'wish') {
-      closeCart(); openWishlist();
+      closeEverything();
+      openWishlist();
     } else if (section === 'account') {
-      closeWishlist();
+      closeEverything();
       if (currentUser) { showToast(`SIGNED IN AS ${currentUser.first.toUpperCase()}`); }
       else { openLogin(); }
     }
