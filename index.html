@@ -759,42 +759,39 @@
     .bottom-nav {
       display: none;
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 190;
-      background: rgba(8,8,8,0.97); border-top: 1px solid rgba(184,151,58,0.12);
-      backdrop-filter: blur(16px);
-      padding: 0.5rem 0 env(safe-area-inset-bottom, 0.5rem);
+      background: rgba(8,8,8,0.98);
+      border-top: 1px solid rgba(201,168,76,0.15);
       grid-template-columns: repeat(4, 1fr);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      transition: transform 0.45s cubic-bezier(0.4,0,0.2,1);
+    }
+    .bottom-nav.slide-out {
+      transform: translateY(110%);
     }
     .bn-item {
-      display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
-      padding: 0.5rem; background: none; border: none; cursor: none;
-      color: var(--muted); transition: color 0.3s;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 10px 4px 8px;
+      background: none; border: none;
+      color: var(--muted);
       font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.15em;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
     }
-    .bn-item.active, .bn-item:hover { color: var(--gold); }
+    .bn-item.active { color: var(--gold); }
     .bn-item svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.5; }
     .bn-badge {
-      position: absolute; top: 6px; right: calc(50% - 18px);
+      position: absolute; top: 6px; right: calc(50% - 20px);
       width: 14px; height: 14px; background: var(--gold); color: var(--black);
       border-radius: 50%; font-size: 8px; font-weight: 900;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Cinzel', serif; opacity: 0; transition: opacity 0.3s;
+      display: none; align-items: center; justify-content: center;
+      font-family: 'Cinzel', serif;
     }
-    .bn-badge.show { opacity: 1; }
-    .bn-item { position: relative; }
-
-    /* Wishlist counter en nav */
-    .wish-nav-count {
-      position: absolute; top: -6px; right: -6px;
-      width: 15px; height: 15px; background: var(--gold); color: var(--black);
-      border-radius: 50%; font-size: 8px; font-weight: 900;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Cinzel', serif; opacity: 0; transition: opacity 0.3s;
-    }
-    .wish-nav-count.show { opacity: 1; }
+    .bn-badge.show { display: flex; }
 
     @media (max-width: 768px) {
       .bottom-nav { display: grid; }
-      body { padding-bottom: 64px; }
+      body { padding-bottom: 68px; }
     }
     .collection-page {
       display: none;
@@ -2142,52 +2139,65 @@
   }
 
   // ══════════════════════════════════
-  // BOTTOM NAV
+  // CERRAR TODO
   // ══════════════════════════════════
   function closeEverything() {
-    // Cerrar todas las páginas/modales
     document.querySelectorAll('.collection-page').forEach(p => p.classList.remove('active'));
-    const pd = document.getElementById('productDetailPage');
-    if (pd) pd.classList.remove('active');
-    const ws = document.getElementById('wishSidebar');
-    if (ws) ws.classList.remove('open');
-    const wo = document.getElementById('wishOverlay');
-    if (wo) wo.classList.remove('open');
-    const cs = document.getElementById('cartSidebar');
-    if (cs) cs.classList.remove('open');
-    const co = document.getElementById('cartOverlay');
-    if (co) co.classList.remove('open');
-    const mm = document.getElementById('mobileMenu');
-    if (mm) mm.classList.remove('open');
+    const ids = ['productDetailPage','wishSidebar','wishOverlay','cartSidebar','cartOverlay','mobileMenu'];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('active', 'open');
+    });
     const hb = document.getElementById('hamburger');
     if (hb) hb.classList.remove('open');
     menuOpen = false;
-    // Restaurar scroll SIEMPRE
     document.body.style.overflow = '';
     document.documentElement.style.overflow = '';
   }
 
+  // ══════════════════════════════════
+  // BOTTOM NAV — desaparece al navegar
+  // ══════════════════════════════════
+  function hideBottomNav(callback) {
+    const nav = document.getElementById('bottomNav');
+    if (!nav) { if (callback) callback(); return; }
+    nav.classList.add('slide-out');
+    // Después de la animación (450ms) ejecutar acción y quitar padding
+    setTimeout(() => {
+      nav.style.display = 'none';
+      document.body.style.paddingBottom = '0';
+      if (callback) callback();
+    }, 450);
+  }
+
   function bnNav(section) {
+    // Marcar activo visualmente
     document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
-    document.getElementById('bn-' + section)?.classList.add('active');
+    const btn = document.getElementById('bn-' + section);
+    if (btn) btn.classList.add('active');
 
     if (section === 'home') {
       closeEverything();
-      setTimeout(() => {
-        document.getElementById('hero').scrollIntoView({ behavior: 'smooth' });
-      }, 50);
+      hideBottomNav(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
     } else if (section === 'shop') {
       closeEverything();
-      setTimeout(() => {
-        document.getElementById('shop').scrollIntoView({ behavior: 'smooth' });
-      }, 50);
+      hideBottomNav(() => {
+        const el = document.getElementById('shop');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      });
     } else if (section === 'wish') {
       closeEverything();
-      openWishlist();
+      hideBottomNav(() => {
+        openWishlist();
+      });
     } else if (section === 'account') {
-      closeEverything();
-      if (currentUser) { showToast(`SIGNED IN AS ${currentUser.first.toUpperCase()}`); }
-      else { openLogin(); }
+      hideBottomNav(() => {
+        closeEverything();
+        if (currentUser) showToast('SIGNED IN AS ' + currentUser.first.toUpperCase());
+        else openLogin();
+      });
     }
   }
 
